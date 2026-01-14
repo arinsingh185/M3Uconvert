@@ -5,27 +5,22 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
 {}
 
-void MainWindow::dragEnterEvent(QDragEnterEvent* event) {
-	if (event->mimeData()->hasUrls()) {
-		event->acceptProposedAction();
+void MainWindow::on_SelectFolder_clicked() {
+	dir = QFileDialog::getExistingDirectory(this, tr("Open folder location"),
+		"/home",
+		QFileDialog::ShowDirsOnly);
+	
+	files = dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+
+	foreach(QString file, files) {
+		ui.fileViewer->addItem(file);
 	}
 }
 
-void MainWindow::dropEvent(QDropEvent* event) {
-	int row{ 0 };
-	if (event->mimeData()->hasUrls()) {
-		foreach(QUrl url, event->mimeData()->urls()) {
-			ui.listFileWidget->insertItem(row, url.fileName());
-			row++;
 
-		}
-	}
-
-}
 
