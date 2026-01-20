@@ -7,9 +7,9 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
-#include <QFileDialog>
 #include <QListView>
 #include <QDir>
+#include <QTextStream>
 
 
 
@@ -31,13 +31,19 @@ public:
 	
 private slots:
 	void on_SelectFolder_clicked();
+	void on_Organize_clicked();
 
 private:
-    Ui::M3UconvertClass ui;
-    //QListWidget* listFileWidget = new QListWidget();
-    //std::vector<fileInfo> files;
-    QStringList files;
-    QDir dir;
+	void move(QDir filePath);
+	void m3uGeneration(QStringList folders);
+
+
+     Ui::M3UconvertClass ui;
+     QStringList files;
+     QDir dir;
+     QString fileName;
+
+
 };
 
 #endif
