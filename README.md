@@ -94,7 +94,3 @@ The deployed application will be in `install\bin\`.
 ## Contributing
 
 Issues and pull requests are welcome. If you run into a game whose discs aren't grouped correctly, please open an issue with the filenames involved.
-
-## License
-
-*(Add your chosen license here — e.g. MIT, GPL-3.0. If you're not sure which to use, [choosealicense.com](https://choosealicense.com/) is a good starting point.)*
