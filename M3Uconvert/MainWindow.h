@@ -10,38 +10,29 @@
 #include <QListView>
 #include <QDir>
 #include <QTextStream>
+#include <QMap>
 
 
-
-struct fileInfo{
-
-	QString fileName;
-	QString fileDir;
-
-};
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
- 
-	
+	MainWindow(QWidget* parent = nullptr);
+	~MainWindow();
+
+
 private slots:
 	void on_SelectFolder_clicked();
 	void on_Organize_clicked();
 
 private:
-	void move(QDir filePath);
-	void m3uGeneration(QStringList folders);
+	void m3uGeneration(const QMap<QString, QStringList>& gameGroups);
 
-
-     Ui::M3UconvertClass ui;
-     QStringList files;
-     QDir dir;
-     QString fileName;
+	Ui::M3UconvertClass ui;
+	QStringList files;
+	QDir dir;
 
 
 };

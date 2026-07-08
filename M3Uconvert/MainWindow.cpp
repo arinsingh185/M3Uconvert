@@ -1,80 +1,80 @@
 #include "stdafx.h"
 #include "MainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
 }
 
 MainWindow::~MainWindow()
-{}
+{
+}
 
 void MainWindow::on_SelectFolder_clicked() {
-	QStringList filter;
+    QStringList filter;
 
-	filter << "*.chd";
-	
+    filter << "*.chd";
 
-	dir = QFileDialog::getExistingDirectory(this, tr("Open folder location"),
-		"/home",
-		QFileDialog::ShowDirsOnly);
-	dir.setNameFilters(filter);
-	files = dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 
-	foreach(QString file, files) {
-		ui.fileViewer->addItem(file);
-	}
+    dir = QDir(QFileDialog::getExistingDirectory(this, tr("Open folder location"),
+        "/home",
+        QFileDialog::ShowDirsOnly));
+    dir.setNameFilters(filter);
+    files = dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+
+    foreach(QString file, files) {
+        ui.fileViewer->addItem(file);
+    }
 }
 
 void MainWindow::on_Organize_clicked() {
+    if (files.isEmpty()) {
+        ui.ErrorBox->setPlainText("Error: No folder selected or folder is empty.");
+        return;
+    }
 
-	QStringList newFolders;
+    QMap<QString, QStringList> gameGroups;
 
-	if (files.isEmpty()){
-		ui.ErrorBox->setPlainText("Error: No folder selected or folder is empty.");
-		return;
-	}
+    foreach(QString file, files) {
+        if (!file.endsWith(".chd", Qt::CaseInsensitive))
+            continue;
 
-	foreach(QString file, files) {
-		fileName = file.first(file.indexOf(" ("));
-		
-		if (dir.mkdir(fileName)) {
-			qDebug() << "Directory created";
-			newFolders.append(dir.path() + "/" + fileName);
-		}
-		else {
-			qDebug() << "Directory already exists";
-		}
-		move(dir.absoluteFilePath(file));
-		
-	}
+        int idx = file.indexOf(" (");
+        if (idx == -1)
+            continue; // not a multi-disc-style name, skip
 
-	
+        QString baseName = file.left(idx);
+        gameGroups[baseName].append(file);
+    }
 
-	m3uGeneration(newFolders);
-
+    m3uGeneration(gameGroups);
 }
 
-void MainWindow::move(QDir filePath) {
-	dir.rename(filePath.path(), dir.path() + "/" + fileName + "/" + filePath.dirName());
+void MainWindow::m3uGeneration(const QMap<QString, QStringList>& gameGroups) {
+    for (auto it = gameGroups.constBegin(); it != gameGroups.constEnd(); ++it) {
+        QString gameName = it.key();
+        QStringList discs = it.value();
+
+        if (discs.size() < 2)
+            continue; // no point making an m3u for a single-disc game
+
+        discs.sort(); // keeps Disc 1, Disc 2, Disc 3... in order
+
+        QFile m3u(dir.filePath(gameName + ".m3u"));
+        if (m3u.open(QFile::WriteOnly | QFile::Truncate)) {
+            QTextStream out(&m3u);
+            foreach(const QString & disc, discs) {
+                out << disc << "\n";
+            }
+            m3u.close();
+            qDebug() << "Created" << gameName + ".m3u";
+        }
+        else {
+            qDebug() << "Failed to write m3u for" << gameName;
+        }
+    }
 }
-
-void MainWindow::m3uGeneration(QStringList folders) {
-	foreach(QString folder, folders) {
-		QDir currDir = folder;
-		QStringList roms = currDir.entryList(QDir::Files);
-		QFile m3u(folder + "/" + currDir.dirName() + ".m3u");
-		if(m3u.open(QFile::WriteOnly | QFile::Truncate)) {
-			foreach(QString rom, roms) {
-					QTextStream out(&m3u);
-					out << rom << "\n";
-				}
-			}
-		}
-	}
-
-
 
 
 
