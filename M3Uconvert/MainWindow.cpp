@@ -42,7 +42,7 @@ void MainWindow::on_Organize_clicked() {
 
         int idx = file.indexOf(" (");
         if (idx == -1)
-            continue; // not a multi-disc-style name, skip
+            continue;
 
         QString baseName = file.left(idx);
         gameGroups[baseName].append(file);
@@ -57,9 +57,9 @@ void MainWindow::m3uGeneration(const QMap<QString, QStringList>& gameGroups) {
         QStringList discs = it.value();
 
         if (discs.size() < 2)
-            continue; // no point making an m3u for a single-disc game
+            continue;
 
-        discs.sort(); // keeps Disc 1, Disc 2, Disc 3... in order
+        discs.sort(); 
 
         QFile m3u(dir.filePath(gameName + ".m3u"));
         if (m3u.open(QFile::WriteOnly | QFile::Truncate)) {
